@@ -8,6 +8,45 @@ def invert_img(img):
     img = (255-img)
     return img
 
+def view_all_contours(im):
+    main = np.array([[]])
+    cnt_target = im.copy()
+    
+    for c in cnts:
+        epsilon = 0.02*cv2.arcLength(c,True)
+        approx = cv2.approxPolyDP(c,epsilon,True)
+
+        test = im.copy()
+        cv2.drawContours(test, cnts, -1,(0,0,255),2)
+        #print 'Contours: ', contours
+        #if len(approx) == 4:
+        if len(approx) > 0:
+            print 'Found rectangle'
+            print 'Approx.shape: ', approx.shape
+            print 'Test.shape: ', test.shape
+
+            # frame_f = frame_f[y: y+h, x: x+w]
+            frame_f = test[approx[0,0,1]:approx[2,0,1], approx[0,0,0]:approx[2,0,0]]
+
+            print 'frame_f.shape: ', frame_f.shape
+            main = np.append(main, approx[None,:][None,:])
+            print 'main: ', main
+            
+        #cv2.imshow('Show Ya', test)
+        #print 'Approx: ', approx.shape
+
+        # Uncomment in order to show all rectangles in image
+        
+        cv2.imshow('Show Ya', frame_f)
+        cv2.waitKey()
+    print '---------------------------------------------'
+    cv2.drawContours(cnt_target, cnts, -1,(0,255,0),2)
+    print main.shape
+    print main
+    return cnt_target
+
+
+
 time_1 = time()
 
  
@@ -80,12 +119,13 @@ cv2.grabCut(thresh_one,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
 
 
 #cv2.imshow('Before contours', thresh_one)
-cnt_target = target.copy()
+
 # Code to draw the contours
 contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
-cv2.drawContours(cnt_target, cnts, -1,(0,0,255),2)
+cnt_target = view_all_contours(target)
+#cv2.drawContours(cnt_target, cnts, -1,(0,0,255),2)
 print time() - time_1
 
 res = imutils.resize(thresh_one, height = 700)
