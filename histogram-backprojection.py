@@ -13,13 +13,15 @@ time_1 = time()
  
 #roi = cv2.imread('images/soccer-player-2.jpg')
 #roi = cv2.imread('images/surgeon_2.jpg')
-roi = cv2.imread('images/beach_trash_3.jpg')
+roi = cv2.imread('images/object_group_0.jpg')
+#roi = cv2.imread('images/beach_trash_3.jpg')
 
 hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
  
 #target = cv2.imread('images/soccer-player-2.jpg')
 #target = cv2.imread('images/surgeon_2.jpg')
-target = cv2.imread('images/beach_trash_3.jpg')
+target = cv2.imread('images/object_group_0.jpg')
+#target = cv2.imread('images/beach_trash_3.jpg')
 target = imutils.resize(target, height = 400)
 
 hsvt = cv2.cvtColor(target,cv2.COLOR_BGR2HSV)
@@ -52,9 +54,9 @@ cv2.imshow('Before morph', thresh_c)
 '''
 
 # Implementing morphological erosion & dilation
-kernel = np.ones((6,6),np.uint8)
-thresh_one = cv2.erode(thresh_one, kernel, iterations = 2)
-thresh_one = cv2.dilate(thresh_one, kernel, iterations=1)
+kernel = np.ones((6,6),np.uint8)  # (6,6) to get more contours (9,9) to reduce noise
+thresh_one = cv2.erode(thresh_one, kernel, iterations = 3)
+thresh_one = cv2.dilate(thresh_one, kernel, iterations=2)
 
 
 # Invert the image
@@ -78,18 +80,18 @@ cv2.grabCut(thresh_one,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
 
 
 #cv2.imshow('Before contours', thresh_one)
-
+cnt_target = target.copy()
 # Code to draw the contours
 contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-cnts = sorted(contours, key = cv2.contourArea, reverse = True)[:5]
+cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
-cv2.drawContours(target, cnts, -1,(0,255,0),2)
+cv2.drawContours(cnt_target, cnts, -1,(0,0,255),2)
 print time() - time_1
 
 res = imutils.resize(thresh_one, height = 700)
-
-cv2.imshow('After contours', thresh_one)
-cv2.imshow('All contours', target)
+cv2.imshow('Original image', target)
+cv2.imshow('Preprocessed', thresh_one)
+cv2.imshow('All contours', cnt_target)
 
 cv2.waitKey(0)
 

@@ -2,7 +2,7 @@ from pyimagesearch.transform import four_point_transform
 from matplotlib import pyplot as plt
 import numpy as np
 import cv2
-import imutils
+from pyimagesearch import imutils
 
 #im = cv2.imread('images/star-simple.jpg')
 #im = cv2.imread('images/lego.png')
@@ -19,7 +19,8 @@ import imutils
 #im = cv2.imread('images/car_three.jpg')
 #im = cv2.imread('images/anthony-1.jpg')
 #im = cv2.imread('images/car_two.jpg')
-im = cv2.imread('images/beach_trash_3.jpg')
+im = cv2.imread('images/object_group_0.jpg')
+#im = cv2.imread('images/beach_trash_3.jpg')
 #im = cv2.imread('images/circles1.png')
 #im = cv2.imread('images/waterbottle_0.jpg')
 
@@ -95,7 +96,8 @@ else:
 
 contours, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-cnts = sorted(contours, key = cv2.contourArea, reverse = True)[:5]
+#cnts = sorted(contours, key = cv2.contourArea, reverse = True)[:10]
+cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
 test = im.copy()
 cv2.drawContours(test, cnts, -1,(0,255,0),2)
