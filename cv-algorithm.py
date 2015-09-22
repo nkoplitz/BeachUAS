@@ -120,12 +120,14 @@ cv2.grabCut(thresh_one,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
 
 #cv2.imshow('Before contours', thresh_one)
 
+cnt_target = target.copy()
+
 # Code to draw the contours
 contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
-cnt_target = view_all_contours(target)
-#cv2.drawContours(cnt_target, cnts, -1,(0,0,255),2)
+#cnt_target = view_all_contours(target)
+cv2.drawContours(cnt_target, cnts, -1,(0,0,255),2)
 print time() - time_1
 
 res = imutils.resize(thresh_one, height = 700)
