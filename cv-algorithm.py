@@ -15,32 +15,54 @@ def view_all_contours(im):
     for c in cnts:
         epsilon = 0.02*cv2.arcLength(c,True)
         approx = cv2.approxPolyDP(c,epsilon,True)
-
+        area = cv2.contourArea(c)
+        print 'area: ', area
         test = im.copy()
-        cv2.drawContours(test, cnts, -1,(0,0,255),2)
+        
+        
+        
+        
         #print 'Contours: ', contours
-        #if len(approx) == 4:
-        if len(approx) > 0:
-            print 'Found rectangle'
-            print 'Approx.shape: ', approx.shape
-            print 'Test.shape: ', test.shape
+        # To weed out contours that are too small
+        if area > 200:
+            print c[0,0]
 
-            # frame_f = frame_f[y: y+h, x: x+w]
-            frame_f = test[approx[0,0,1]:approx[2,0,1], approx[0,0,0]:approx[2,0,0]]
+            max_pos = c.max(axis=0)
+            max_x = max_pos[0,0]
+            max_y = max_pos[0,1]
 
-            print 'frame_f.shape: ', frame_f.shape
-            main = np.append(main, approx[None,:][None,:])
-            print 'main: ', main
+            min_pos = c.min(axis=0)
+            min_x = min_pos[0,0]
+            min_y = min_pos[0,1]
             
+            
+            
+            # Load each contour onto image
+            cv2.drawContours(cnt_target, c, -1,(0,0,255),2)
+            #cv2.drawContours(test, c, -1,(0,0,255),2)
+            #cv2.imshow('Original image', cnt_target)
+            
+            
+            print 'Found object'
+            #print 'Approx.shape: ', approx.shape
+            #print 'Test.shape: ', test.shape
+            
+            #frame_f = frame_f[y: y+h, x: x+w]
+            frame_f = test[min_y:max_y , min_x:max_x]
+
+            #print 'frame_f.shape: ', frame_f.shape
+            main = np.append(main, approx[None,:][None,:])
+            #print 'main: ', main
+            cv2.imshow('Show Ya', frame_f)
+            cv2.waitKey(0)
         #cv2.imshow('Show Ya', test)
         #print 'Approx: ', approx.shape
 
         # Uncomment in order to show all rectangles in image
         
-        cv2.imshow('Show Ya', frame_f)
-        cv2.waitKey()
+        
     print '---------------------------------------------'
-    cv2.drawContours(cnt_target, cnts, -1,(0,255,0),2)
+    #cv2.drawContours(cnt_target, cnts, -1,(0,255,0),2)
     print main.shape
     print main
     return cnt_target
@@ -52,14 +74,14 @@ time_1 = time()
  
 #roi = cv2.imread('images/soccer-player-2.jpg')
 #roi = cv2.imread('images/surgeon_2.jpg')
-#roi = cv2.imread('images/object_group_0.jpg')
+#roi = cv2.imread('images/object_group_2.jpg')
 roi = cv2.imread('images/beach_trash_3.jpg')
 
 hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
  
 #target = cv2.imread('images/soccer-player-2.jpg')
 #target = cv2.imread('images/surgeon_2.jpg')
-#target = cv2.imread('images/object_group_0.jpg')
+#target = cv2.imread('images/object_group_2.jpg')
 target = cv2.imread('images/beach_trash_3.jpg')
 target = imutils.resize(target, height = 400)
 
@@ -121,19 +143,21 @@ cv2.grabCut(thresh_one,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
 #cv2.imshow('Before contours', thresh_one)
 
 cnt_target = target.copy()
+cnt_full = target.copy()
 
 # Code to draw the contours
 contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
-#cnt_target = view_all_contours(target)
-cv2.drawContours(cnt_target, cnts, -1,(0,0,255),2)
+cnt_target = view_all_contours(target)
+cv2.drawContours(cnt_full, cnts, -1,(0,0,255),2)
 print time() - time_1
 
 res = imutils.resize(thresh_one, height = 700)
 cv2.imshow('Original image', target)
 cv2.imshow('Preprocessed', thresh_one)
-cv2.imshow('All contours', cnt_target)
+cv2.imshow('All contours', cnt_full)
+cv2.imshow('Filtered contours', cnt_target)
 
 cv2.waitKey(0)
 
