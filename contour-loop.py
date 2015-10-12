@@ -80,18 +80,22 @@ for c in cnts:
 
     test = im.copy()
     cv2.drawContours(test, [approx], -1,(0,255,0),2)
+
+    area = cv2.contourArea(c)
+    print 'area: ', area
+
     #print 'Contours: ', contours
     if len(approx) == 4:
         print 'Found rectangle'
-        print 'Approx.shape: ', approx.shape
-        print 'Test.shape: ', test.shape
+        #print 'Approx.shape: ', approx.shape
+        #print 'Test.shape: ', test.shape
 
         # frame_f = frame_f[y: y+h, x: x+w]
         frame_f = test[approx[0,0,1]:approx[2,0,1], approx[0,0,0]:approx[2,0,0]]
 
-        print 'frame_f.shape: ', frame_f.shape
+        #print 'frame_f.shape: ', frame_f.shape
         main = np.append(main, approx[None,:][None,:])
-        print 'main: ', main
+        #print 'main: ', main
         
     #cv2.imshow('Show Ya', test)
     #print 'Approx: ', approx.shape

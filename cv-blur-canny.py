@@ -19,7 +19,7 @@ from pyimagesearch import imutils
 #im = cv2.imread('images/car_three.jpg')
 #im = cv2.imread('images/anthony-1.jpg')
 #im = cv2.imread('images/car_two.jpg')
-#im = cv2.imread('images/object_group_0.jpg')
+#im = cv2.imread('images/object_group_1.jpg')
 im = cv2.imread('images/beach_trash_3.jpg')
 #im = cv2.imread('images/circles1.png')
 #im = cv2.imread('images/waterbottle_0.jpg')
@@ -34,7 +34,7 @@ im = cv2.imread('images/beach_trash_3.jpg')
 ###
 #im = np.fliplr(im)
 
-im = imutils.resize(im, height = 500)
+im = imutils.resize(im, height = 400)
 
 imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 

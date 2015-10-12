@@ -8,12 +8,19 @@ def invert_img(img):
     img = (255-img)
     return img
 
-def view_all_contours(im):
+def threshold(im):
+    imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+    imgray = cv2.medianBlur(imgray,9)
+    imgray = cv2.Canny(imgray,75,200)
+    
+    return imgray
+
+def view_all_contours(im, size_min, size_max):
     main = np.array([[]])
     cnt_target = im.copy()
     
     for c in cnts:
-        epsilon = 0.02*cv2.arcLength(c,True)
+        epsilon = 0.1*cv2.arcLength(c,True)
         approx = cv2.approxPolyDP(c,epsilon,True)
         area = cv2.contourArea(c)
         print 'area: ', area
@@ -24,9 +31,10 @@ def view_all_contours(im):
         
         #print 'Contours: ', contours
         # To weed out contours that are too small
-        if area > 200:
+        if area > size_min and area < size_max:
             print c[0,0]
-
+            print 'approx: ', len(approx)
+            #print 'epsilon: ', epsilon
             max_pos = c.max(axis=0)
             max_x = max_pos[0,0]
             max_y = max_pos[0,1]
@@ -53,8 +61,19 @@ def view_all_contours(im):
             #print 'frame_f.shape: ', frame_f.shape
             main = np.append(main, approx[None,:][None,:])
             #print 'main: ', main
+
+            thresh = frame_f.copy()
+            thresh = threshold(thresh)
+
+            contours_small, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+            cnts_small = sorted(contours_small, key = cv2.contourArea, reverse = True)
+            cv2.drawContours(frame_f, cnts_small, -1,(0,0,255),2)
+            cv2.imshow('Thresh', thresh)
             cv2.imshow('Show Ya', frame_f)
             cv2.waitKey(0)
+            
+
+            
         #cv2.imshow('Show Ya', test)
         #print 'Approx: ', approx.shape
 
@@ -149,9 +168,14 @@ cnt_full = target.copy()
 contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
-cnt_target = view_all_contours(target)
-cv2.drawContours(cnt_full, cnts, -1,(0,0,255),2)
 print time() - time_1
+
+size_min = 200
+size_max = 5000
+
+cnt_target = view_all_contours(target, size_min, size_max)
+cv2.drawContours(cnt_full, cnts, -1,(0,0,255),2)
+
 
 res = imutils.resize(thresh_one, height = 700)
 cv2.imshow('Original image', target)
