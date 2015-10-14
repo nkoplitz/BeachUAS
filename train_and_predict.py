@@ -103,6 +103,9 @@ print 'Done!'
 
 
 
+
+
+
 ############# Entering predicting phase ###############
 
 
@@ -110,7 +113,7 @@ print 'Done!'
 
 
 # Load the classifier, class names, scaler, number of clusters and vocabulary 
-clf, classes_names, stdSlr, k, voc = joblib.load("bof_uav.pkl")
+clf, classes_names, stdSlr, k, voc = joblib.load("bof_cuav.pkl")
 
 # Get the path of the testing set
 '''
@@ -196,8 +199,12 @@ idf = np.array(np.log((1.0*len(image_paths)+1) / (1.0*nbr_occurences + 1)), 'flo
 # Scale the features
 test_features = stdSlr.transform(test_features)
 
+class_num = [0,1,2]
+
 # Perform the predictions
 predictions =  [classes_names[i] for i in clf.predict(test_features)]
+
+predictions_1 =  [class_num[i] for i in clf.predict(test_features)]
 
 # Visualize the results, if "visualize" flag set to true by the user
 if visualize:
@@ -209,4 +216,14 @@ if visualize:
         cv2.imshow("Image", image)
         print '- ', prediction
         cv2.waitKey(3000)
+
+
+
+accuracy = accuracy_score(image_classes_te, predictions_1)
+
+print 'Confusion Matrix: '
+print confusion_matrix(image_classes_te, predictions_1)
+
+# Accuracy in the 0.9333, 9.6667, 1.0 range
+print accuracy
 
