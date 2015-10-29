@@ -2,7 +2,8 @@
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
-import imutils 
+import imutils
+from pyimagesearch import imutilspy
 import numpy as np
 import os
 from sklearn.svm import LinearSVC
@@ -15,7 +16,7 @@ from sklearn.metrics import accuracy_score,accuracy_score, confusion_matrix
 
 
 # Initate ORB detector object
-orb = cv2.ORB()
+orb = cv2.ORB_create()
 
 # Get the path of the training set
 #parser = ap.ArgumentParser()
@@ -53,6 +54,7 @@ print 'Iterating through features'
 for image_path in image_paths_tr:
     #print image_path
     im = cv2.imread(image_path)
+    im = imutilspy.resize(im, height = 400)
     
     #kpts = fea_det.detect(im)
     kpts = orb.detect(im,None)
@@ -161,7 +163,7 @@ des_ext = cv2.DescriptorExtractor_create("SIFT")
 '''
 
 # Initate ORB detector object
-orb = cv2.ORB()
+orb = cv2.ORB_create()
 
 
 # List where all the descriptors are stored
@@ -172,6 +174,7 @@ for image_path in image_paths_te:
     if im == None:
         print "No such file {}\nCheck if the file exists".format(image_path)
         exit()
+    im = imutilspy.resize(im, height = 400)
     #kpts = fea_det.detect(im)
     kpts = orb.detect(im,None)
     

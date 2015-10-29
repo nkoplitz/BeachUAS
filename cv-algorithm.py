@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from pyimagesearch import imutils
+from pyimagesearch import imutilspy
 from PIL import Image
 from time import time
 
@@ -102,7 +102,7 @@ hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
 #target = cv2.imread('images/surgeon_2.jpg')
 #target = cv2.imread('images/object_group_2.jpg')
 target = cv2.imread('images/beach_trash_3.jpg')
-target = imutils.resize(target, height = 400)
+target = imutilspy.resize(target, height = 400)
 
 hsvt = cv2.cvtColor(target,cv2.COLOR_BGR2HSV)
 
