@@ -65,7 +65,7 @@ def view_all_contours(im, size_min, size_max):
             thresh = frame_f.copy()
             thresh = threshold(thresh)
 
-            contours_small, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+            __ , contours_small, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
             cnts_small = sorted(contours_small, key = cv2.contourArea, reverse = True)
             cv2.drawContours(frame_f, cnts_small, -1,(0,0,255),2)
             cv2.imshow('Thresh', thresh)
@@ -165,8 +165,10 @@ cnt_target = target.copy()
 cnt_full = target.copy()
 
 # Code to draw the contours
-contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+__ , contours, hierarchy = cv2.findContours(thresh_one.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 cnts = sorted(contours, key = cv2.contourArea, reverse = True)
+
+
 
 print time() - time_1
 
@@ -177,7 +179,7 @@ cnt_target = view_all_contours(target, size_min, size_max)
 cv2.drawContours(cnt_full, cnts, -1,(0,0,255),2)
 
 
-res = imutils.resize(thresh_one, height = 700)
+res = imutilspy.resize(thresh_one, height = 700)
 cv2.imshow('Original image', target)
 cv2.imshow('Preprocessed', thresh_one)
 cv2.imshow('All contours', cnt_full)

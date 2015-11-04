@@ -181,6 +181,9 @@ for image_path in image_paths_tr:
 print 'Converting data to matrix. . .'
 descriptors = des_list[0][1]
 for image_path, descriptor in des_list[1:]:
+    if descriptor == None:
+        print 'Skipped ', image_path, '. . .'
+        continue
     descriptors = np.vstack((descriptors, descriptor))  
 
 # Perform k-means clustering
