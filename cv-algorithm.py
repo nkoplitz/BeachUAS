@@ -15,7 +15,7 @@ def threshold(im):
     
     return imgray
 
-def view_all_contours(im, size_min, size_max):
+def view_all_contours(im, size_min, size_max, visual):
     main = np.array([[]])
     cnt_target = im.copy()
     
@@ -68,9 +68,10 @@ def view_all_contours(im, size_min, size_max):
             __ , contours_small, hierarchy = cv2.findContours(thresh.copy(),cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
             cnts_small = sorted(contours_small, key = cv2.contourArea, reverse = True)
             cv2.drawContours(frame_f, cnts_small, -1,(0,0,255),2)
-            cv2.imshow('Thresh', thresh)
-            cv2.imshow('Show Ya', frame_f)
-            cv2.waitKey(0)
+            if visual:
+                cv2.imshow('Thresh', thresh)
+                cv2.imshow('Show Ya', frame_f)
+                cv2.waitKey(0)
             
 
             
@@ -90,19 +91,21 @@ def view_all_contours(im, size_min, size_max):
 
 time_1 = time()
 
+#path = 'images/surgeon_2.jpg'
+#path = 'images/beach_trash_3.jpg'
+path = 'images/beach_trash_11.jpg'
  
 #roi = cv2.imread('images/soccer-player-2.jpg')
-#roi = cv2.imread('images/surgeon_2.jpg')
 #roi = cv2.imread('images/object_group_2.jpg')
-roi = cv2.imread('images/beach_trash_3.jpg')
+roi = cv2.imread(path)
 
 hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
  
 #target = cv2.imread('images/soccer-player-2.jpg')
 #target = cv2.imread('images/surgeon_2.jpg')
 #target = cv2.imread('images/object_group_2.jpg')
-target = cv2.imread('images/beach_trash_3.jpg')
-target = imutilspy.resize(target, height = 400)
+target = cv2.imread(path)
+target = imutilspy.resize(target, height = 1000)
 
 hsvt = cv2.cvtColor(target,cv2.COLOR_BGR2HSV)
 
@@ -173,9 +176,10 @@ cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 print time() - time_1
 
 size_min = 200
-size_max = 5000
+size_max = 8000
+visual = False
 
-cnt_target = view_all_contours(target, size_min, size_max)
+cnt_target = view_all_contours(target, size_min, size_max, visual)
 cv2.drawContours(cnt_full, cnts, -1,(0,0,255),2)
 
 

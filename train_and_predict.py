@@ -139,7 +139,7 @@ orb = cv2.ORB_create()
 #args = vars(parser.parse_args())
 
 # Get the training classes names and store them in a list
-train_path = 'dataset/data/'
+train_path = 'dataset/4x4_data/'
 training_names = os.listdir(train_path)
 
 # Get all the path to the images and save them in a list
@@ -161,7 +161,8 @@ image_paths_tr, image_paths_te, image_classes_tr, image_classes_te = cross_valid
 
 # List where all the descriptors are stored
 des_list = []
-
+sk_count = 0
+count = 0
 print 'Iterating through features'
 for image_path in image_paths_tr:
     #print image_path
@@ -174,13 +175,22 @@ for image_path in image_paths_tr:
     #kpts, des = des_ext.compute(im, kpts)
     kp, des = orb.compute(im, kpts)
     
-    des_list.append((image_path, des))
     
+    if des == None:
+        print image_path
+        os.remove(image_path)
+        sk_count = sk_count + 1
+    else:
+        des_list.append((image_path, des))
+    count = count + 1
+
+#print sk_count, ' out of ', count, ' skipped'
     
 # Stack all the descriptors vertically in a numpy array
 print 'Converting data to matrix. . .'
 descriptors = des_list[0][1]
 for image_path, descriptor in des_list[1:]:
+
     if descriptor == None:
         print 'Skipped ', image_path, '. . .'
         continue
