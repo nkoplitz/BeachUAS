@@ -70,36 +70,6 @@ def main_mat_construct(image_paths_m):
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
-    """
-    Generate a simple plot of the test and traning learning curve.
-
-    Parameters
-    ----------
-    estimator : object type that implements the "fit" and "predict" methods
-        An object of that type which is cloned for each validation.
-
-    title : string
-        Title for the chart.
-
-    X : array-like, shape (n_samples, n_features)
-        Training vector, where n_samples is the number of samples and
-        n_features is the number of features.
-
-    y : array-like, shape (n_samples) or (n_samples, n_features), optional
-        Target relative to X for classification or regression;
-        None for unsupervised learning.
-
-    ylim : tuple, shape (ymin, ymax), optional
-        Defines minimum and maximum yvalues plotted.
-
-    cv : integer, cross-validation generator, optional
-        If an integer is passed, it is the number of folds (defaults to 3).
-        Specific cross-validation objects can be passed, see
-        sklearn.cross_validation module for the list of possible objects
-
-    n_jobs : integer, optional
-        Number of jobs to run in parallel (default 1).
-    """
     plt.figure()
     plt.title(title)
     if ylim is not None:
@@ -127,6 +97,18 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.legend(loc="best")
     return plt
 
+def grabCut(img):
+    
+    mask = np.zeros(img.shape[:2],np.uint8)
+    bgdModel = np.zeros((1,65),np.float64)
+    fgdModel = np.zeros((1,65),np.float64)
+
+    #rect = (50,50,450,290)
+    rect = (0,0,img.shape[0],img.shape[1])
+    cv2.grabCut(img,mask,rect,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_RECT)
+    mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
+    img = img*mask2[:,:,np.newaxis]
+    return img
 
 t0 = time()
 
@@ -139,7 +121,11 @@ orb = cv2.ORB_create()
 #args = vars(parser.parse_args())
 
 # Get the training classes names and store them in a list
-train_path = 'dataset/4x4_data/'
+
+train_path = 'dataset/data_two/'
+#train_path = 'dataset/data_two_choice/train/'
+#train_path = 'caltech_dataset/data/'
+
 training_names = os.listdir(train_path)
 
 # Get all the path to the images and save them in a list
@@ -165,9 +151,10 @@ sk_count = 0
 count = 0
 print 'Iterating through features'
 for image_path in image_paths_tr:
-    #print image_path
     im = cv2.imread(image_path)
     im = imutilspy.resize(im, height = 200)
+
+    im = grabCut(im)
     
     #kpts = fea_det.detect(im)
     kpts = orb.detect(im,None)
@@ -301,6 +288,9 @@ des_list = []
 for image_path in image_paths_te:
     im = cv2.imread(image_path)
     im = imutilspy.resize(im, height = 200)
+
+    im = grabCut(im)
+    
     if im == None:
         print "No such file {}\nCheck if the file exists".format(image_path)
         exit()
@@ -309,7 +299,8 @@ for image_path in image_paths_te:
     
     #kpts, des = des_ext.compute(im, kpts)
     kpts, des = orb.compute(im, kpts)
-    
+    cv2.imshow('test',im)
+    cv2.waitKey(0)
     des_list.append((image_path, des))   
     
 # Stack all the descriptors vertically in a numpy array

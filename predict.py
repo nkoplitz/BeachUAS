@@ -9,6 +9,8 @@ from sklearn.svm import LinearSVC
 from sklearn.externals import joblib
 from scipy.cluster.vq import *
 
+from sklearn.metrics import accuracy_score,accuracy_score, confusion_matrix
+
 # Load the classifier, class names, scaler, number of clusters and vocabulary 
 clf, classes_names, stdSlr, k, voc = joblib.load("bof_uav.pkl")
 
@@ -32,13 +34,13 @@ response = raw_input()
 
 
 
-test_paths = 'dataset/our_test'
+test_paths = 'dataset/data_two_choice/test/'
 visualize = True
 
 # Get the path of the testing image(s) and store them in a list
 image_paths = []
 if response == 't':
-    test_path = 'dataset/our_test'
+    test_path = 'dataset/data_two_choice/test/'
     try:
         testing_names = os.listdir(test_path)
     except OSError:
@@ -58,7 +60,7 @@ des_ext = cv2.DescriptorExtractor_create("SIFT")
 '''
 
 # Initate ORB detector object
-orb = cv2.ORB()
+orb = cv2.ORB_create()
 
 
 # List where all the descriptors are stored
@@ -98,6 +100,8 @@ test_features = stdSlr.transform(test_features)
 
 # Perform the predictions
 predictions =  [classes_names[i] for i in clf.predict(test_features)]
+
+
 
 # Visualize the results, if "visualize" flag set to true by the user
 if visualize:

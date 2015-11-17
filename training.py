@@ -13,7 +13,7 @@ from scipy.cluster.vq import *
 from sklearn.preprocessing import StandardScaler
 
 # Initate ORB detector object
-orb = cv2.ORB()
+orb = cv2.ORB_create()
 
 # Get the path of the training set
 #parser = ap.ArgumentParser()
@@ -21,7 +21,7 @@ orb = cv2.ORB()
 #args = vars(parser.parse_args())
 
 # Get the training classes names and store them in a list
-train_path = 'dataset/our_train/'
+train_path = 'dataset/data_two_choice/train/'
 training_names = os.listdir(train_path)
 
 # Get all the path to the images and save them in a list
