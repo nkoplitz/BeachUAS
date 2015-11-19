@@ -92,8 +92,11 @@ def view_all_contours(im, size_min, size_max, visual):
 time_1 = time()
 
 #path = 'images/surgeon_2.jpg'
-#path = 'images/beach_trash_3.jpg'
-path = 'images/beach_trash_11.jpg'
+path = 'images/beach_trash_3.jpg'
+#path = 'images/beach_trash_11.jpg'
+
+#visual = False
+visual = True
  
 #roi = cv2.imread('images/soccer-player-2.jpg')
 #roi = cv2.imread('images/object_group_2.jpg')
@@ -176,8 +179,8 @@ cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 print time() - time_1
 
 size_min = 200
-size_max = 8000
-visual = False
+size_max = 10000
+
 
 cnt_target = view_all_contours(target, size_min, size_max, visual)
 cv2.drawContours(cnt_full, cnts, -1,(0,0,255),2)

@@ -112,6 +112,12 @@ def grabCut(img):
 
 t0 = time()
 
+while True:
+    print 'Press [b] to do training and predicting or [p] for just prediction' 
+    option = raw_input()
+    if option == 'b' or option == 'p':
+        break
+
 # Initate ORB detector object
 orb = cv2.ORB_create()
 
@@ -141,83 +147,85 @@ for training_name in training_names:
     image_paths_m+=class_path
     image_classes_m+=[class_id]*len(class_path)
     class_id+=1
-    
+        
 image_paths_tr, image_paths_te, image_classes_tr, image_classes_te = cross_validation.train_test_split(image_paths_m, image_classes_m, test_size = 0.2)
 
-
-# List where all the descriptors are stored
-des_list = []
-sk_count = 0
-count = 0
-print 'Iterating through features'
-for image_path in image_paths_tr:
-    im = cv2.imread(image_path)
-    im = imutilspy.resize(im, height = 200)
-
-    im = grabCut(im)
     
-    #kpts = fea_det.detect(im)
-    kpts = orb.detect(im,None)
-    
-    #kpts, des = des_ext.compute(im, kpts)
-    kp, des = orb.compute(im, kpts)
-    
-    
-    if des == None:
-        print image_path
-        os.remove(image_path)
-        sk_count = sk_count + 1
-    else:
-        des_list.append((image_path, des))
-    count = count + 1
+if option == 'b':
 
-#print sk_count, ' out of ', count, ' skipped'
-    
-# Stack all the descriptors vertically in a numpy array
-print 'Converting data to matrix. . .'
-descriptors = des_list[0][1]
-for image_path, descriptor in des_list[1:]:
+    # List where all the descriptors are stored
+    des_list = []
+    sk_count = 0
+    count = 0
+    print 'Iterating through features'
+    for image_path in image_paths_tr:
+        im = cv2.imread(image_path)
+        im = imutilspy.resize(im, height = 200)
 
-    if descriptor == None:
-        print 'Skipped ', image_path, '. . .'
-        continue
-    descriptors = np.vstack((descriptors, descriptor))  
+        #im = grabCut(im)
+        
+        #kpts = fea_det.detect(im)
+        kpts = orb.detect(im,None)
+        
+        #kpts, des = des_ext.compute(im, kpts)
+        kp, des = orb.compute(im, kpts)
+        
+        
+        if des == None:
+            print image_path
+            os.remove(image_path)
+            sk_count = sk_count + 1
+        else:
+            des_list.append((image_path, des))
+        count = count + 1
 
-# Perform k-means clustering
-k = 100
-voc, variance = kmeans(descriptors, k, 1) 
+    #print sk_count, ' out of ', count, ' skipped'
+        
+    # Stack all the descriptors vertically in a numpy array
+    print 'Converting data to matrix. . .'
+    descriptors = des_list[0][1]
+    for image_path, descriptor in des_list[1:]:
 
-# Calculate the histogram of features
-print 'Calculating histogram of features. . .'
-im_features = np.zeros((len(image_paths_tr), k), "float32")
-for i in xrange(len(image_paths_tr)):
-    words, distance = vq(des_list[i][1],voc)
-    for w in words:
-        im_features[i][w] += 1
+        if descriptor == None:
+            print 'Skipped ', image_path, '. . .'
+            continue
+        descriptors = np.vstack((descriptors, descriptor))  
 
-# Perform Tf-Idf vectorization
-nbr_occurences = np.sum( (im_features > 0) * 1, axis = 0)
-idf = np.array(np.log((1.0*len(image_paths_tr)+1) / (1.0*nbr_occurences + 1)), 'float32')
+    # Perform k-means clustering
+    k = 100
+    voc, variance = kmeans(descriptors, k, 1) 
 
-# Scaling the words
-print 'Scaling Words. . .'
-stdSlr = StandardScaler().fit(im_features)
-im_features = stdSlr.transform(im_features)
+    # Calculate the histogram of features
+    print 'Calculating histogram of features. . .'
+    im_features = np.zeros((len(image_paths_tr), k), "float32")
+    for i in xrange(len(image_paths_tr)):
+        words, distance = vq(des_list[i][1],voc)
+        for w in words:
+            im_features[i][w] += 1
+
+    # Perform Tf-Idf vectorization
+    nbr_occurences = np.sum( (im_features > 0) * 1, axis = 0)
+    idf = np.array(np.log((1.0*len(image_paths_tr)+1) / (1.0*nbr_occurences + 1)), 'float32')
+
+    # Scaling the words
+    print 'Scaling Words. . .'
+    stdSlr = StandardScaler().fit(im_features)
+    im_features = stdSlr.transform(im_features)
 
 
-# Train the Linear SVM
-print 'Training SVM. . .'
-#clf = LinearSVC()
-clf = svm.SVC(kernel='poly')
-clf.fit(im_features, np.array(image_classes_tr))
+    # Train the Linear SVM
+    print 'Training SVM. . .'
+    #clf = LinearSVC()
+    clf = svm.SVC(kernel='poly')
+    clf.fit(im_features, np.array(image_classes_tr))
 
-# Save the SVM
-print 'Saving SVM model. . .'
-joblib.dump((clf, training_names, stdSlr, k, voc), "bof_cuav.pkl", compress=3)    
-print 'Done!'    
+    # Save the SVM
+    print 'Saving SVM model. . .'
+    joblib.dump((clf, training_names, stdSlr, k, voc), "bof_cuav.pkl", compress=3)    
+    print 'Done!'    
 
-total_time = time() - t0
-print total_time, 's'
+    total_time = time() - t0
+    print total_time, 's'
 
 
 
@@ -289,7 +297,7 @@ for image_path in image_paths_te:
     im = cv2.imread(image_path)
     im = imutilspy.resize(im, height = 200)
 
-    im = grabCut(im)
+    #im = grabCut(im)
     
     if im == None:
         print "No such file {}\nCheck if the file exists".format(image_path)
@@ -299,8 +307,6 @@ for image_path in image_paths_te:
     
     #kpts, des = des_ext.compute(im, kpts)
     kpts, des = orb.compute(im, kpts)
-    cv2.imshow('test',im)
-    cv2.waitKey(0)
     des_list.append((image_path, des))   
     
 # Stack all the descriptors vertically in a numpy array
