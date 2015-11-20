@@ -92,11 +92,13 @@ def view_all_contours(im, size_min, size_max, visual):
 time_1 = time()
 
 #path = 'images/surgeon_2.jpg'
-path = 'images/beach_trash_3.jpg'
+#path = 'images/beach_trash_3.jpg'
+path = 'images/beach_trash_9.jpg'
 #path = 'images/beach_trash_11.jpg'
+#path = 'images/beach_trash_13.jpg'
 
-#visual = False
 visual = True
+#visual = False
  
 #roi = cv2.imread('images/soccer-player-2.jpg')
 #roi = cv2.imread('images/object_group_2.jpg')
@@ -116,11 +118,11 @@ img_height = target.shape[0]
 img_width = target.shape[1]
 
 # calculating object histogram
-roihist = cv2.calcHist([hsv],[0, 1], None, [180, 256], [0, 180, 0, 256] )
+roihist = cv2.calcHist([hsv],[0, 1], None, [180, 256], [0, img_height, 0, img_width] )
  
 # normalize histogram and apply backprojection
 cv2.normalize(roihist,roihist,0,255,cv2.NORM_MINMAX)
-dst = cv2.calcBackProject([hsvt],[0,1],roihist,[0,180,0,256],1)
+dst = cv2.calcBackProject([hsvt],[0,1],roihist,[0,img_height,0,img_width],1)
  
 # Now convolute with circular disc
 disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
@@ -178,7 +180,7 @@ cnts = sorted(contours, key = cv2.contourArea, reverse = True)
 
 print time() - time_1
 
-size_min = 200
+size_min = 4300
 size_max = 10000
 
 
